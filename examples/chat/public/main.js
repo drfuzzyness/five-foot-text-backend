@@ -10,6 +10,7 @@ $(function () {
     // Initialize variables
     var $window = $(window);
     var $usernameInput = $('.usernameInput'); // Input for username
+    var $friendInput = $('.usernameInput');
     var $messages = $('.messages'); // Messages area
     var $inputMessage = $('.inputMessage'); // Input message input box
 
@@ -19,6 +20,7 @@ $(function () {
 
     // Prompt for setting a username
     var username;
+    var friend;
     var userLocation;
     var connected = false;
     var typing = false;
@@ -40,6 +42,7 @@ $(function () {
     // Sets the client's username
     function setUsername() {
         username = cleanInput($usernameInput.val().trim());
+        friend = cleanInput($friendInput.val().trim());
     
         // If the username is valid
         if (username) {
@@ -49,7 +52,11 @@ $(function () {
             $currentInput = $inputMessage.focus();
 
             // Tell the server your username
-            socket.emit('add user', username);
+            socket.emit('add user', {
+                username: username,
+                friend: friend,
+                location: location
+            });
         }
     }
 
@@ -74,10 +81,15 @@ $(function () {
             $inputMessage.val('');
             addChatMessage({
                 username: username,
+                friend: friend,
+                location: location,
                 message: message
             });
             // tell server to execute 'new message' and send along one parameter
-            socket.emit('new message', message);
+            socket.emit('new message', {
+                message: message,
+                friend: friend
+            });
         }
     }
 
