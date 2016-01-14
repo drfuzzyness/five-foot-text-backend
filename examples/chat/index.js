@@ -29,11 +29,12 @@ io.on('connection', function (socket) {
     });
 
     // when the client emits 'add user', this listens and executes
-    socket.on('add user', function (username) {
+    socket.on('add user', function (data) {
         if (addedUser) return;
 
         // we store the username in the socket session for this client
-        socket.username = username;
+        socket.username = data.username;
+        socket.location = data.location;
         ++numUsers;
         addedUser = true;
         socket.emit('login', {
@@ -42,6 +43,7 @@ io.on('connection', function (socket) {
         // echo globally (all clients) that a person has connected
         socket.broadcast.emit('user joined', {
             username: socket.username,
+            location: socket.location,
             numUsers: numUsers
         });
     });
