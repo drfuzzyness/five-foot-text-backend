@@ -9,13 +9,14 @@ $(function () {
 
     // Initialize variables
     var $window = $(window);
-    var $usernameInput = $('.usernameInput'); // Input for username
-    var $friendInput = $('.usernameInput');
+    var $usernameInput = $('#usernameInput'); // Input for username
+    var $friendInput = $('#friendInput');
     var $messages = $('.messages'); // Messages area
     var $inputMessage = $('.inputMessage'); // Input message input box
+    var $setNamesButton = $('#setNamesButton');
 
-    var $loginPage = $('.login.page'); // The login page
-    var $chatPage = $('.chat.page'); // The chatroom page
+    var $loginPage = $('#setup'); // The login page
+    var $chatPage = $('.conversation'); // The chatroom pages
     
 
     // Prompt for setting a username
@@ -25,7 +26,7 @@ $(function () {
     var connected = false;
     var typing = false;
     var lastTypingTime;
-    var $currentInput = $usernameInput.focus();
+    // var $currentInput = $usernameInput.focus();
 
     var socket = io();
 
@@ -43,13 +44,14 @@ $(function () {
     function setUsername() {
         username = cleanInput($usernameInput.val().trim());
         friend = cleanInput($friendInput.val().trim());
-    
+        
+        localStorage.setItem( "username", username );
         // If the username is valid
-        if (username) {
-            $loginPage.fadeOut();
-            $chatPage.show();
-            $loginPage.off('click');
-            $currentInput = $inputMessage.focus();
+        if (username && friend) {
+            $loginPage.removeClass('active');
+            $chatPage.addClass('active');
+            // $loginPage.off('click');
+            // $currentInput = $inputMessage.focus();
 
             // Tell the server your username
             socket.emit('add user', {
@@ -218,7 +220,7 @@ $(function () {
     $window.keydown(function (event) {
         // Auto-focus the current input when a key is typed
         if (!(event.ctrlKey || event.metaKey || event.altKey)) {
-            $currentInput.focus();
+            // $currentInput.focus();
         }
         // When the client hits ENTER on their keyboard
         if (event.which === 13) {
@@ -231,6 +233,10 @@ $(function () {
             }
         }
     });
+    
+    $setNamesButton.on('click', function() {
+       setUsername(); 
+    });
 
     $inputMessage.on('input', function () {
         updateTyping();
@@ -238,15 +244,15 @@ $(function () {
 
     // Click events
 
-    // Focus input when clicking anywhere on login page
-    $loginPage.click(function () {
-        $currentInput.focus();
-    });
+    // // Focus input when clicking anywhere on login page
+    // $loginPage.click(function () {
+    //     $currentInput.focus();
+    // });
 
-    // Focus input when clicking on the message input's border
-    $inputMessage.click(function () {
-        $inputMessage.focus();
-    });
+    // // Focus input when clicking on the message input's border
+    // $inputMessage.click(function () {
+    //     $inputMessage.focus();
+    // });
 
     // Socket events
 

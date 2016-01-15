@@ -1,0 +1,51 @@
+#pages {
+    margin: 0;
+    padding: 0;
+    li {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+        display: none;
+        &.active {
+            display: block;
+        }
+    }
+}
+
+.chatArea {
+    padding-top: rem-calc(64px);
+    .messages {
+        .message {
+            margin: 0;
+            padding-top: rem-calc(16px);
+            padding-bottom: rem-calc(16px);
+            background: red;
+        }
+        .log {
+            margin: 0;
+            padding-top: rem-calc(16px);
+            padding-bottom: rem-calc(16px);
+            color: lightslategrey;
+            // background: blue;
+        }
+    }
+}
+
+.back-button {
+    // position: relative;
+    // display: inline-block;
+    // vertical-align: middle;
+    // // cursor: pointer;
+    // width: 20px;
+    // height: 16px;
+    margin-left: 0.25rem;
+    margin-right: 0.5rem;
+}
+
+
+.bottom-bar {
+    position: absolute;
+    width: 100%;
+    background: lightgray;
+    bottom: 0;
+}

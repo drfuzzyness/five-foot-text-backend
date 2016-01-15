@@ -4,6 +4,7 @@ var app = express();
 var server = require('http').createServer(app);
 var io = require('../..')(server);
 var port = process.env.PORT || 3000;
+var REQUIRED_DISTANCE = 5;
 
 server.listen(port, function () {
     console.log('Server listening at port %d', port);
@@ -16,9 +17,28 @@ app.use(express.static(__dirname + '/public'));
 
 var numUsers = 0;
 
+var users = [
+    {
+        id: "u16512",
+        username: "matt",
+        location: {
+            lat: "12.2",
+            lon: "12.2"
+        },
+        
+    },
+    {
+        id: "u125125",
+        username: "dan",
+        location: {
+            lat: "12.2",
+            lon: "12.2"
+        }
+    }
+];
+
 io.on('connection', function (socket) {
     var addedUser = false;
-    
     // username: socket.username,
     // friend: socket.friend,
     // location: socket.location,
@@ -34,6 +54,8 @@ io.on('connection', function (socket) {
             message: data.message
         });
     });
+    
+    
 
     // when the client emits 'add user', this listens and executes
     socket.on('add user', function (data) {
@@ -47,6 +69,14 @@ io.on('connection', function (socket) {
         socket.join(socket.username);
         ++numUsers;
         addedUser = true;
+        
+        users.push({
+            id: id,
+            username: data.username,
+
+            location: data.location
+        });
+        
         socket.emit('login', {
             numUsers: numUsers
         });
@@ -85,4 +115,22 @@ io.on('connection', function (socket) {
             });
         }
     });
+    
+    function isWithinDistance( user ) {
+        if( user ) {
+            if( user) {
+                
+            }
+        }
+    }
 });
+
+function findUserByName( targetName ) {
+    for( var user in users ) {
+        if( user.username == targetName ) {
+            return user;
+        }
+    }
+    console.log( "Could not find username: " + targetName );
+}
+
