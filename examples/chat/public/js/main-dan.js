@@ -21,7 +21,7 @@ var socket = io.connect('http://172.26.101.113:3000/');
     //var $loginPage = $('.login.page'); // The login page
     //var $chatPage = $('.chat.page'); // The chatroom page
     
-    alert("Made it past declarations");
+    // alert("Made it past declarations");
 
     var username;
     var friend;

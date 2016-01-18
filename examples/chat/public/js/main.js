@@ -10,87 +10,100 @@ $(function () {
     // Initialize variables
     var $window = $(window);
     var $usernameInput = $('#usernameInput'); // Input for username
+    var $registerUsernameInput = $('#registerUsernameInput');
     var $friendInput = $('#friendInput');
     var $messages = $('.messages'); // Messages area
     var $inputMessage = $('.inputMessage'); // Input message input box
     var $setNamesButton = $('#setNamesButton');
-
+    
+    // var $chatPage = $('.conversation');
+    // $chatPage.$sendMessageInterface = $('.bottom-bar.sendMessageInterface');
+    // $chatPage.$unavaliableInterface = $('.bottom-bar.unavaliableInterface');
+    // $chatpage.$yourUsername = $('chatArea.your-name.username');
+    
+    var $conversationListPage = $('#conversation-list');
+    
     var $loginPage = $('#setup'); // The login page
-    var $chatPage = $('.conversation'); // The chatroom pages
+    
     
 
     // Prompt for setting a username
     var username;
-    var friend;
-    var userLocation;
+    var currentFriend;
+    var friends = [];
     var connected = false;
-    var typing = false;
-    var lastTypingTime;
     // var $currentInput = $usernameInput.focus();
 
-    var socket = io();
-
-    function addParticipantsMessage(data) {
-        var message = '';
-        if (data.numUsers === 1) {
-            message += "there's 1 participant";
-        } else {
-            message += "there are " + data.numUsers + " participants";
-        }
-        log(message);
+    var socket = io.connect('http://172.26.101.113:3000/');
+    
+    function onLoad() {
+        updateLocationEveryFiveSeconds();
+    }
+    
+    function openContactListPage() {
+        $loginPage.removeClass("active");
+        // $chatPage.removeClass("active");
+        $conversationListPage.addClass("active");
     }
 
     // Sets the client's username
-    function setUsername() {
-        username = cleanInput($usernameInput.val().trim());
-        friend = cleanInput($friendInput.val().trim());
+    // function setUsername() {
+    //     username = cleanInput($usernameInput.val().trim());
+    //     friend = cleanInput($friendInput.val().trim());
         
-        localStorage.setItem( "username", username );
-        // If the username is valid
-        if (username && friend) {
-            $loginPage.removeClass('active');
-            $chatPage.addClass('active');
-            // $loginPage.off('click');
-            // $currentInput = $inputMessage.focus();
+    //     localStorage.setItem( "username", username );
+    //     // If the username is valid
+    //     if (username && friend) {
+    //         $loginPage.removeClass('active');
+    //         $chatPage.addClass('active');
+    //         // $loginPage.off('click');
+    //         // $currentInput = $inputMessage.focus();
 
-            // Tell the server your username
-            socket.emit('add user', {
-                username: username,
-                friend: friend,
-                location: location
+    //         // Tell the server your username
+    //         socket.emit('add user', {
+    //             username: username,
+    //             friend: friend,
+    //             location: location
+    //         });
+    //     }
+    // }
+    
+    
+    
+    function onRegister() {
+        username = cleanInput($usernameInput.val().trim());
+        if( username ) {
+            connected = true;
+            socket.emit('register', {
+                username: username
             });
-        }
+        }  
     }
-
-    function getLocation() {
-        if (navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition(gotPosition);
-        } else {
-            alert("Geolocation is not supported by this browser.");
-        }
+    
+    function onAddFriend() {
+        var friend = cleanInput($friendInput.val().trim());
+        
     }
-    function gotPosition(position) {
-        userLocation = position;
-    }
-
+    
     // Sends a chat message
     function sendMessage() {
         var message = $inputMessage.val();
         // Prevent markup from being injected into the message
         message = cleanInput(message);
         // if there is a non-empty message and a socket connection
-        if (message && connected) {
-            $inputMessage.val('');
-            addChatMessage({
-                username: username,
-                friend: friend,
-                location: location,
-                message: message
-            });
+        if (message) {
+            // $inputMessage.val('');
+            // addChatMessage({
+            //     username: username,
+            //     friend: friend,
+            //     location: location,
+            //     message: message
+            // });
             // tell server to execute 'new message' and send along one parameter
-            socket.emit('new message', {
+            // alert( message );
+            socket.emit('send message', {
                 message: message,
-                friend: friend
+                targetUser: "currentFriend"
             });
         }
     }
@@ -100,24 +113,15 @@ $(function () {
         var $el = $('<li>').addClass('log').text(message);
         addMessageElement($el, options);
     }
-
-    // Adds the visual chat message to the message list
+    
     function addChatMessage(data, options) {
-        // Don't fade the message in if there is an 'X was typing'
-        var $typingMessages = getTypingMessages(data);
-        options = options || {};
-        if ($typingMessages.length !== 0) {
-            options.fade = false;
-            $typingMessages.remove();
-        }
 
         var $usernameDiv = $('<span class="username"/>')
             .text(data.username)
-            .css('color', getUsernameColor(data.username));
         var $messageBodyDiv = $('<span class="messageBody">')
             .text(data.message);
 
-        var typingClass = data.typing ? 'typing' : '';
+        // var typingClass = data.typing ? 'typing' : '';
         var $messageDiv = $('<li class="message"/>')
             .data('username', data.username)
             .addClass(typingClass)
@@ -126,18 +130,35 @@ $(function () {
         addMessageElement($messageDiv, options);
     }
 
-    // Adds the visual chat typing message
-    function addChatTyping(data) {
-        data.typing = true;
-        data.message = 'is typing';
-        addChatMessage(data);
-    }
 
-    // Removes the visual chat typing message
-    function removeChatTyping(data) {
-        getTypingMessages(data).fadeOut(function () {
-            $(this).remove();
+    function updateLocationEveryFiveSeconds(){
+        // alert("stating update location");
+        console.log( "currently connected: " + connected );
+        if( connected ) {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(successCallback, errorCallback, {});
+            }
+            
+        }
+            // alert("set callbax");
+            
+        
+        setTimeout(updateLocationEveryFiveSeconds, 5000);
+    }
+    
+    function successCallback(currentPosition) {
+        var lat = currentPosition.coords.latitude;
+        var lon = currentPosition.coords.longitude;
+        socket.emit('update location', {
+            lat: lat,
+            lng: lon
         });
+        console.log( "updated location " + lat + ", " + lon );
+        // alert("sent location");
+    }
+    
+    function errorCallback(e) {
+            alert(e);
     }
 
     // Adds a message element to the messages and scrolls to the bottom
@@ -170,128 +191,57 @@ $(function () {
         }
         $messages[0].scrollTop = $messages[0].scrollHeight;
     }
+    
+    function addFriends() {
+        
+    }
 
-    // Prevents input from having injected markup
     function cleanInput(input) {
         return $('<div/>').text(input).text();
     }
-
-    // Updates the typing event
-    function updateTyping() {
-        if (connected) {
-            if (!typing) {
-                typing = true;
-                socket.emit('typing');
-            }
-            lastTypingTime = (new Date()).getTime();
-
-            setTimeout(function () {
-                var typingTimer = (new Date()).getTime();
-                var timeDiff = typingTimer - lastTypingTime;
-                if (timeDiff >= TYPING_TIMER_LENGTH && typing) {
-                    socket.emit('stop typing');
-                    typing = false;
-                }
-            }, TYPING_TIMER_LENGTH);
-        }
-    }
-
-    // Gets the 'X is typing' messages of a user
-    function getTypingMessages(data) {
-        return $('.typing.message').filter(function (i) {
-            return $(this).data('username') === data.username;
-        });
-    }
-
-    // Gets the color of a username through our hash function
-    function getUsernameColor(username) {
-        // Compute hash code
-        var hash = 7;
-        for (var i = 0; i < username.length; i++) {
-            hash = username.charCodeAt(i) + (hash << 5) - hash;
-        }
-        // Calculate color
-        var index = Math.abs(hash % COLORS.length);
-        return COLORS[index];
-    }
-
-    // Keyboard events
-
-    $window.keydown(function (event) {
-        // Auto-focus the current input when a key is typed
-        if (!(event.ctrlKey || event.metaKey || event.altKey)) {
-            // $currentInput.focus();
-        }
-        // When the client hits ENTER on their keyboard
-        if (event.which === 13) {
-            if (username) {
-                sendMessage();
-                socket.emit('stop typing');
-                typing = false;
-            } else {
-                setUsername();
-            }
+    
+    $("#sendMessageButton").click(function() {
+        
+        sendMessage();
+    });
+    
+    $("#changeNameButton").click(function() {
+        onRegister();
+    })
+    
+    socket.on('login result', function (data) {
+        if( data.success ) {
+            connected = true;
+            
+            // Display the welcome message
+            displayConnectionSuccess();
+        } else {
+            alert(data.errorMessage);
         }
     });
     
-    $setNamesButton.on('click', function() {
-       setUsername(); 
-    });
-
-    $inputMessage.on('input', function () {
-        updateTyping();
-    });
-
-    // Click events
-
-    // // Focus input when clicking anywhere on login page
-    // $loginPage.click(function () {
-    //     $currentInput.focus();
-    // });
-
-    // // Focus input when clicking on the message input's border
-    // $inputMessage.click(function () {
-    //     $inputMessage.focus();
-    // });
-
-    // Socket events
-
-    // Whenever the server emits 'login', log the login message
-    socket.on('login', function (data) {
-        connected = true;
-        // Display the welcome message
-        var message = "Welcome to Socket.IO Chat – ";
-        log(message, {
-            prepend: true
-        });
-        addParticipantsMessage(data);
+    socket.on( 'available', function(data){
+        
     });
 
     // Whenever the server emits 'new message', update the chat body
-    socket.on('new message', function (data) {
+    socket.on('incoming message', function (data) {
+        console.log("got message " + data)
         addChatMessage(data);
     });
 
-    // Whenever the server emits 'user joined', log it in the chat body
-    socket.on('user joined', function (data) {
-        log(data.username + ' joined');
-        addParticipantsMessage(data);
-    });
-
-    // Whenever the server emits 'user left', log it in the chat body
-    socket.on('user left', function (data) {
-        log(data.username + ' left');
-        addParticipantsMessage(data);
-        removeChatTyping(data);
-    });
-
-    // Whenever the server emits 'typing', show the typing message
-    socket.on('typing', function (data) {
-        addChatTyping(data);
-    });
-
     // Whenever the server emits 'stop typing', kill the typing message
-    socket.on('stop typing', function (data) {
-        removeChatTyping(data);
+    socket.on('register result', function (data) {
+        if( data.success ) {
+            username = data.username;
+            connected = true;
+            // openContactListPage();
+        } else {
+            alert( data.errorMessage );
+        }
+    });
+    
+    $( document ).ready(function() {
+        onLoad();
     });
 });
