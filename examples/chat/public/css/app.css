@@ -404,17 +404,34 @@
       display: block; }
 
 .chatArea {
-  padding-top: 4rem; }
-  .chatArea .messages .message {
-    margin: 0;
-    padding-top: 1rem;
-    padding-bottom: 1rem;
-    background: red; }
-  .chatArea .messages .log {
-    margin: 0;
-    padding-top: 1rem;
-    padding-bottom: 1rem;
-    color: lightslategrey; }
+  padding-top: 4rem;
+  margin: 0;
+  overflow: scroll;
+  max-height: 80%; }
+  .chatArea .messages {
+    list-style-type: none;
+    margin: 0; }
+    .chatArea .messages .message {
+      display: block;
+      width: 100%;
+      margin: 0;
+      padding-top: 1rem;
+      padding-bottom: 1rem; }
+      .chatArea .messages .message .username {
+        font-weight: bold; }
+      .chatArea .messages .message.incoming {
+        text-align: left;
+        float: left; }
+      .chatArea .messages .message.outgoing {
+        float: right;
+        text-align: right; }
+        .chatArea .messages .message.outgoing .username {
+          margin-left: 2em; }
+    .chatArea .messages .log {
+      margin: 0;
+      padding-top: 1rem;
+      padding-bottom: 1rem;
+      color: lightslategrey; }
 
 .back-button {
   margin-left: 0.25rem;

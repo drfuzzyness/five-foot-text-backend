@@ -8,7 +8,7 @@
     <title>5ft Texting - Served</title>
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link rel="stylesheet" href="css/app.css">
-    
+
 </head>
 
 <body>
@@ -22,11 +22,11 @@
             <div class="row align-bottom">
                 <div class="column small-8">
                     <!--<button class="button">Connect to Facebook</button>-->
-                    <input type="text" id="usernameInput" placeholder="name">
-                    <input type="text" id="friendInput" placeholder="friend">
+                    <p>Register</p>
+                    <input type="text" id="registerUsernameInput" placeholder="name">
                 </div>
                 <div class="column">
-                    <button id="setNamesButton" class="button">Register</button>
+                    <button id="setNamesButton" class="button" onclick="onRegister()">Register</button>
                 </div>
             </div>
         </li>
@@ -54,28 +54,14 @@
                 </div>
             </div>
             <section>
-                <div class="row active">
-                    <div class="small-12 column your-name">
-                        <span>Your name is <strong>Grey</strong></span>
+                <div class="row">
+                    <!--<div class="small-12 column your-name">
+                        <span class="username">Your name is <strong class="name">Grey</strong></span>
                         <button class="button small secondary" id="editName" data-toggle="editNameModal">edit</button>
-                    </div>
-                    <!--<div class="reveal" id="editNameModal" data-reveal>
-                        <h2>Change your name</h2>
-                        <p>Other users need to know your name to add you</p>
-
-                        <label for="">
-                            <input type="text" id="usernameInput" placeholder="new name">
-                            
-                        </label>
-
-                        <button class="button" id="changeNameButton">change</button>
-                        <button class="close-button" data-close aria-label="Close reveal" type="button">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
                     </div>-->
                     <div class="small-12 column add-friend">
                         <input type="text" id="friendInput" placeholder="add someone">
-                        <button class="button" id="addFriendButton">start</button>
+                        <button class="button" id="addFriendButton" onclick="onAddFriend()">add</button>
                     </div>
                     <div class="small-12 column">
                         <ul id="contacts-list">
@@ -112,15 +98,32 @@
             <div class="row">
                 <div class="column chatArea">
                     <div class="small-12 column your-name">
-                        <span>Your name is <strong>Grey</strong></span>
+                        <span>Your name is <strong class="username">Grey</strong></span>
                         <button class="button small secondary" id="editName" data-toggle="editNameModal">edit</button>
                     </div>
                     <!--<div class="chatArea">-->
                     <ul class="messages">
+                        <li class="info">
+                            <p>You can only message <strong class="name">Blue</strong> when you are 5 feet or closer. Make your time together count.</p>
+                        </li>
                         <li class="message">
                             <span class="username">Blue</span>
                             <span class="messageBody">hey, what's up</span>
                         </li>
+                        <li class="message">
+                            <span class="username"></span>
+                            <span class="messageBody">not much, hb you</span>
+                        </li>
+                        <li class="message">
+                            <span class="username"></span>
+                            <span class="messageBody">how u</span>
+                        </li>
+                        <li class="message">
+                            <span class="username">Blue</span>
+                            <span class="messageBody">p good</span>
+                        </li>
+
+
                     </ul>
                     <!--</div>-->
                 </div>
@@ -129,29 +132,29 @@
                 <div class="row">
                     <div class="small-12 column sendMessageInterface" id="">
                         <input class="inputMessage" type="text" id="inputMessage" placeholder="speak up">
-                        <button id="" onclick="sendMessage()" class="button small">send</button>
+                        <button id="sendMessageButton" class="button small">send</button>
                     </div>
-                    <div class="small-12 column text-center unavalibleInterface" id="">
+                    <div class="small-12 column text-center unavaliableInterface" id="">
                         <span><strong class="user">Blue</strong> is too far away to hear you</span>
                     </div>
                 </div>
             </section>
         </li>
     </ul>
-<div class="reveal" id="editNameModal" data-reveal>
-                        <h2>Change your name</h2>
-                        <p>Other users need to know your name to add you</p>
+    <div class="reveal" id="editNameModal" data-reveal>
+        <h2>Change your name</h2>
+        <p>Other users need to know your name to add you</p>
 
-                        <label for="">
-                            <input type="text" id="usernameInput" placeholder="new name">
-                            
-                        </label>
+        <label for="">
+            <input type="text" id="usernameInput" placeholder="new name">
 
-                        <button class="button" id="changeNameButton">change</button>
-                        <button class="close-button" data-close aria-label="Close reveal" type="button">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
-                    </div>
+        </label>
+
+        <button class="button" id="changeNameButton">change</button>
+        <button class="close-button" data-close aria-label="Close reveal" type="button">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
 
 
 
@@ -161,8 +164,8 @@
     <script src="bower_components/foundation-sites/dist/foundation.js"></script>
     <script src="js/min/app-min.js"></script>
     <script src="http://172.26.101.113:3000/socket.io/socket.io.js"></script>
-    <!--<script src="js/main.js"></script>-->
-    <script src="js/main-dan.js"></script>
+    <script src="js/main.js"></script>
+    <!--<script src="js/main-dan.js"></script>-->
 
 </body>
 

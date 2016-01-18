@@ -14,12 +14,41 @@
 
 .chatArea {
     padding-top: rem-calc(64px);
+    margin: 0;
+    overflow: scroll;
+    max-height: 80%;
     .messages {
+        list-style-type: none;
+        margin: 0;
         .message {
+            display: block;
+            width: 100%;
             margin: 0;
             padding-top: rem-calc(16px);
             padding-bottom: rem-calc(16px);
-            background: red;
+           .username {
+               font-weight: bold;
+               
+           } 
+           &.incoming {
+               text-align: left;
+               float: left;
+               .messageBody {
+                    // margin-left: 2em;
+                }
+           }
+           &.outgoing {
+               float: right;
+               text-align: right;
+               .username {
+                   margin-left: 2em;
+                //    float: right;
+               }
+               .messageBody {
+                //    margin-right: 2em;
+               }
+           }
+           
         }
         .log {
             margin: 0;
