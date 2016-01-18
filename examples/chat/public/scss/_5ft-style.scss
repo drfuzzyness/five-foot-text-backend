@@ -1,7 +1,7 @@
 #pages {
     margin: 0;
     padding: 0;
-    li {
+    li.page {
         list-style: none;
         margin: 0;
         padding: 0;
@@ -48,4 +48,64 @@
     width: 100%;
     background: lightgray;
     bottom: 0;
+}
+
+.topbar {
+    background: black;
+    min-height: 24px;
+    padding-top: 36px;
+    padding-bottom: 10px;
+    
+    h2 {
+            font-size: rem-calc(18px);
+        }
+    .icon {
+        display: inline-block;
+        color: white;
+        // width: 36px;
+        height: 24px;
+        // padding: 24px;
+        
+        
+        margin: 0;
+    }
+}
+
+.add-friend {
+    padding-top: 16px;
+    padding-bottom: 10px;
+    input {
+        max-width: 80%;
+        display: inline-block;
+    }
+    #addFriendButton {
+        position: relative;
+        top: 6px;
+        width: 18%;
+    }
+    background: lightgray;
+}
+
+.your-name {
+    text-align: center;
+    #editName {
+        position: relative;
+        top: 6px;
+    }
+}
+
+ul.contacts-list {
+    display: block;
+    list-style-type: none;
+    margin-left: 0;
+    li {
+        list-style-type: none;
+        display: block;
+        .name {
+            float: left;
+        }
+        .status {
+            float: right;
+        }
+    }
 }

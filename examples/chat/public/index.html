@@ -6,13 +6,14 @@
     <meta http-equiv="x-ua-compatible" content="ie=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>5ft Texting - Served</title>
-    <link rel="stylesheet" href="css/app.css">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="stylesheet" href="css/app.css">
+
 </head>
 
 <body>
     <ul id="pages">
-        <li id="setup" class="active">
+        <li id="setup" class="page">
             <div class="row">
                 <div class="column">
                     <h1>5<br>FT<br>TXT</h1>
@@ -25,60 +26,108 @@
                     <input type="text" id="friendInput" placeholder="friend">
                 </div>
                 <div class="column">
-                    <input type="button" id="setNamesButton" class="button" value="go">
+                    <button id="setNamesButton" class="button">Register</button>
                 </div>
             </div>
         </li>
-        <li id="conversation-list" class="">
+        <li id="conversation-list" class="page">
             <!--<div class="title-bar" data-responsive-toggle="example-menu" data-hide-for="medium">
                 <button class="menu-icon" type="button" data-toggle></button>
                 <div class="title-bar-title">Menu</div>
             </div>-->
 
-            <div class="top-bar" id="example-menu">
-                <div class="top-bar-left">
-                    <ul class="dropdown menu" data-dropdown-menu>
-                        <li class="menu-text">Site Title</li>
-                        <li><a href="#">Two</a></li>
-                        <li><a href="#">Three</a></li>
-                    </ul>
-                </div>
-                <div class="top-bar-right">
-                    <ul class="menu">
-                        <li>
-                            <input type="search" placeholder="Search">
-                        </li>
-                        <li>
-                            <button type="button" class="button">Search</button>
-                        </li>
-                    </ul>
+            <div class="topbar">
+                <div class="row align-justify">
+                    <div class="column">
+                        <div class="icon">
+                            <h2><img src="" alt="5-Foot Texting"></h2>
+                        </div>
+                    </div>
+                    <!--<div class="column text-center">
+                        
+                    </div>-->
+                    <div class="column text-right shrink">
+                        <div class="icon">
+                            <i class="material-icons">more_vert</i>
+                        </div>
+                    </div>
                 </div>
             </div>
+            <section>
+                <div class="row ">
+                    <div class="small-12 column your-name">
+                        <span>Your name is <strong>Grey</strong></span>
+                        <button class="button small secondary" id="editName" data-toggle="editNameModal">edit</button>
+                    </div>
+                    <div class="reveal" id="editNameModal" data-reveal>
+                        <h2>Change your name</h2>
+                        <p>Other users need to know your name to add you</p>
+
+                        <label for="">
+                            <input type="text" id="changeNameInput" placeholder="new name">
+                        </label>
+
+                        <button class="button" id="changeNameButton">change</button>
+                        <button class="close-button" data-close aria-label="Close reveal" type="button">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="small-12 column add-friend">
+                        <input type="text" id="addFriendInput" placeholder="add someone">
+                        <button class="button" id="addFriendButton">start</button>
+                    </div>
+                    <div class="small-12 column">
+                        <ul id="contacts-list">
+                            <li>
+                                <span class="name">John Snow</span>
+                                <span class="status">Far</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
         </li>
-        <li id="" class="conversation">
-            <div class="title-bar" data-responsive-toggle="example-menu">
-                <button type="button" class="back-button"></button>
-                <div class="title-bar-title"><i class="material-icons md-18">back</i></div>
+        <li id="" class=" conversation page active">
+            <div class="topbar">
+                <div class="row align-justify">
+                    <div class="column">
+                        <div class="icon">
+                            <i class="material-icons">arrow_back</i>
+                        </div>
+                        <div class="icon">
+                            <h2>Blue</h2>
+                        </div>
+                    </div>
+                    <!--<div class="column text-center">
+                        
+                    </div>-->
+                    <!--<div class="column text-right shrink">
+                        <div class="icon">
+                            <i class="material-icons">more_vert</i>
+                        </div>
+                    </div>-->
+                </div>
             </div>
             <div class="row">
                 <div class="column chatArea">
                     <!--<div class="chatArea">-->
                     <ul class="messages">
-
+                        <li class="message">
+                            <span class="username">Blue</span>
+                            <span class="messageBody">hey, what's up</span>
+                        </li>
                     </ul>
                     <!--</div>-->
                 </div>
             </div>
             <section class="bottom-bar">
                 <div class="row">
-                    <div class="small-12 column">
-                        <div class="input-group">
-
-                            <input class="inputMessage" type="text" placeholder="speak up">
-                            <div class="input-group-button">
-                                <button class="button"><i class="material-icons">back</i></button>
-                            </div>
-                        </div>
+                    <div class="small-12 column" id="sendMessageInterface">
+                        <input class="inputMessage" type="text" placeholder="speak up">
+                        <button class="button small">send</button>
+                    </div>
+                    <div class="small-12 column text-center" id="unavalibleInterface">
+                        <span><strong class="user">Blue</strong> is too far away to hear you</span>
                     </div>
                 </div>
             </section>
@@ -95,7 +144,7 @@
     <script src="js/min/app-min.js"></script>
     <script src="/socket.io/socket.io.js"></script>
     <script src="js/main.js"></script>
-    
+
 </body>
 
 </html>

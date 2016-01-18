@@ -15,8 +15,6 @@ app.use(express.static(__dirname + '/public'));
 
 // Chatroom
 
-var numUsers = 0;
-
 var users = [
     {
         id: "u16512",
@@ -25,112 +23,75 @@ var users = [
             lat: "12.2",
             lon: "12.2"
         },
-        
-    },
-    {
-        id: "u125125",
-        username: "dan",
-        location: {
-            lat: "12.2",
-            lon: "12.2"
-        }
+        friends: [
+            "u161267"
+        ]
+
     }
 ];
 
 io.on('connection', function (socket) {
     var addedUser = false;
-    // username: socket.username,
-    // friend: socket.friend,
-    // location: socket.location,
-    // message: data
 
-    // when the client emits 'new message', this listens and executes
+
     socket.on('new message', function (data) {
         // we tell the client to execute 'new message'
-        socket.to(socket.friend).emit('new message', {
-            username: socket.username,
-            friend: socket.friend,
-            location: socket.location,
-            message: data.message
-        });
-    });
     
+        // find person to send to
     
-
-    // when the client emits 'add user', this listens and executes
-    socket.on('add user', function (data) {
-        if (addedUser) return;
-
-        // we store the username in the socket session for this client
-        socket.username = data.username;
-        socket.friend = data.friend;
-        socket.location = data.location;
-        
-        socket.join(socket.username);
-        ++numUsers;
-        addedUser = true;
-        
-        users.push({
-            id: id,
-            username: data.username,
-
-            location: data.location
-        });
-        
-        socket.emit('login', {
-            numUsers: numUsers
-        });
-        // echo globally (all clients) that a person has connected
-        socket.to(socket.friend).emit('user joined', {
-            username: socket.username,
-            friend: socket.friend,
-            location: socket.location,
-            numUsers: numUsers
-        });
-    });
-
-    // when the client emits 'typing', we broadcast it to others
-    socket.on('typing', function () {
-        socket.to(socket.friend).emit('typing', {
-            username: socket.username
-        });
-    });
-
-    // when the client emits 'stop typing', we broadcast it to others
-    socket.on('stop typing', function () {
-        socket.to(socket.friend).emit('stop typing', {
-            username: socket.username
-        });
-    });
-
-    // when the user disconnects.. perform this
-    socket.on('disconnect', function () {
-        if (addedUser) {
-            --numUsers;
-
-            // echo globally that this client has left
-            socket.to(socket.friend).emit('user left', {
+        // can we send
+    
+        //send 
+        if (ableToConnect(data.friend)) {
+            socket.to(socket.friend).emit('new message', {
                 username: socket.username,
-                numUsers: numUsers
+                message: data.message
             });
         }
     });
+
+    socket.on('register user', function (data) {
+        if (findByUsername(data.username)) {
+            socket.emit('error', {
+                message: "Username " + data.username + " already taken. Try logging in."
+            })
+        } else {
+            addedUser = true;
+            users.push({
+                id: id,
+                username: data.username,
+                location: data.location,
+                friends: data.friends
+            })
+            socket.join(id);
+            socket.emit('register success');
+        }
+    });
     
-    function isWithinDistance( user ) {
-        if( user ) {
-            if( user) {
-                
-            }
+    socket.on('login', function(data)) {
+        var user = findByUsername(data.username);
+        if (!user) {
+            socket.emit('error', {
+                message: "Username " + data.username + " does not exist. Try logging in."
+            })
+        } else {
+            
+        }
+    };
+    
+    function sendToAllFriends( user, data ) {
+        for( thisUser in users) {
+            if( user.friend )
         }
     }
-});
 
-function findUserByName( targetName ) {
-    for( var user in users ) {
-        if( user.username == targetName ) {
+};
+
+function findUserByName(targetName) {
+    for (var user in users) {
+        if (user.username == targetName) {
             return user;
         }
     }
-    console.log( "Could not find username: " + targetName );
+    console.log("Could not find username: " + targetName);
 }
-
