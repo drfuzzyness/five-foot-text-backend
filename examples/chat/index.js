@@ -68,7 +68,7 @@ io.on('connection', function (socket) {
         }
     });
     
-    socket.on('login', function(data)) {
+    socket.on('login', function(data) {
         var user = findByUsername(data.username);
         if (!user) {
             socket.emit('error', {
@@ -77,15 +77,17 @@ io.on('connection', function (socket) {
         } else {
             
         }
-    };
+    });
     
     function sendToAllFriends( user, data ) {
         for( thisUser in users) {
-            if( user.friend )
+            if( user.friend ) {
+                
+            }
         }
-    }
+    };
 
-};
+});
 
 function findUserByName(targetName) {
     for (var user in users) {
