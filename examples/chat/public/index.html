@@ -13,10 +13,10 @@
 
 <body>
     <ul id="pages">
-        <li id="setup" class="page">
+        <li id="setup" class="page active">
             <div class="row">
-                <div class="column">
-                    <h1>5<br>FT<br>TXT</h1>
+                <div class="small-12 column">
+                    <img src="img/adam af.png" alt="">
                 </div>
             </div>
             <div class="row align-bottom">
@@ -26,7 +26,7 @@
                     <input type="text" id="registerUsernameInput" placeholder="name">
                 </div>
                 <div class="column">
-                    <button id="setNamesButton" class="button" onclick="onRegister()">Register</button>
+                    <button id="setNamesButton" class="button">Register</button>
                 </div>
             </div>
         </li>
@@ -47,6 +47,11 @@
                         
                     </div>-->
                     <div class="column text-right shrink">
+                        <div class="icon" id="refreshFriendsList">
+                            <i class="material-icons">refresh</i>
+                        </div>
+                    </div>
+                    <div class="column text-right shrink">
                         <div class="icon">
                             <i class="material-icons">more_vert</i>
                         </div>
@@ -61,20 +66,21 @@
                     </div>-->
                     <div class="small-12 column add-friend">
                         <input type="text" id="friendInput" placeholder="add someone">
-                        <button class="button" id="addFriendButton" onclick="onAddFriend()">add</button>
+                        <button class="button" id="addFriendButton" >add</button>
                     </div>
+                    <!--<button class="button" id="refreshFriendsList" >refresh friends</button>-->
                     <div class="small-12 column">
                         <ul id="contacts-list">
-                            <li>
+                            <li class="contact">
                                 <span class="name">John Snow</span>
-                                <span class="status">Far</span>
+                                <span class="status">true</span>
                             </li>
                         </ul>
                     </div>
                 </div>
             </section>
         </li>
-        <li id="" class=" conversation page active">
+        <li id="conversation" class="page ">
             <div class="topbar">
                 <div class="row align-justify">
                     <div class="column">
@@ -104,7 +110,12 @@
                     <!--<div class="chatArea">-->
                     <ul class="messages">
                         <li class="info">
-                            <p>You can only message <strong class="name">Blue</strong> when you are 5 feet or closer. Make your time together count.</p>
+                            <div class="row align-center">
+                                <div class="small-8 column">
+                                    <p>You can only message <strong class="name">Blue</strong> when you are 5 feet or closer. Make your time together count.</p>
+                                </div>
+                            </div>
+                            
                         </li>
                         <li class="message">
                             <span class="username">Blue</span>
@@ -151,6 +162,9 @@
         </label>
 
         <button class="button" id="changeNameButton">change</button>
+        
+        <input type="text" id="friendInput" placeholder="add someone">
+        <button class="button" id="addFriendButton">add</button>
         <button class="close-button" data-close aria-label="Close reveal" type="button">
             <span aria-hidden="true">&times;</span>
         </button>
@@ -164,6 +178,7 @@
     <script src="bower_components/foundation-sites/dist/foundation.js"></script>
     <script src="js/min/app-min.js"></script>
     <script src="http://172.26.101.113:3000/socket.io/socket.io.js"></script>
+    <!--<script src="/socket.io/socket.io.js"></script>-->
     <script src="js/main.js"></script>
     <!--<script src="js/main-dan.js"></script>-->
 
