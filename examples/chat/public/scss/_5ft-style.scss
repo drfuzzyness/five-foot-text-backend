@@ -1,6 +1,26 @@
+input:not([type=submit]):not([type=file]):not([type=button]) {
+   padding: rem-calc(16px);
+   border-radius: rem-calc(8px);
+   height: inherit !important;
+}
+
+.white-box {
+    background: white;
+    color: $body-font-color;
+    border-radius: rem-calc(8px);
+    padding: rem-calc(8px);
+    box-shadow: 0 2px 5px rgba(0,0,0,.5);
+}
+
+body {
+    background: url("/img/wallpaper-flower-purple.png") !important;
+    background-repeat: repeat;
+}
+
 #pages {
     margin: 0;
     padding: 0;
+    
     li.page {
         list-style: none;
         margin: 0;
@@ -12,70 +32,202 @@
     }
 }
 
-.chatArea {
-    padding-top: rem-calc(64px);
-    margin: 0;
-    overflow: scroll;
-    max-height: 80%;
-    .messages {
-        list-style-type: none;
-        margin: 0;
-        .message {
-            display: block;
-            width: 100%;
-            margin: 0;
-            padding-top: rem-calc(16px);
-            padding-bottom: rem-calc(16px);
-           .username {
-               font-weight: bold;
-               
-           } 
-           &.incoming {
-               text-align: left;
-               float: left;
-               .messageBody {
-                    // margin-left: 2em;
-                }
-           }
-           &.outgoing {
-               float: right;
-               text-align: right;
-               .username {
-                   margin-left: 2em;
-                //    float: right;
-               }
-               .messageBody {
-                //    margin-right: 2em;
-               }
-           }
-           
+#setup {
+    background: url("/img/wallpaper-flower-purple.png");
+    background-repeat: repeat;
+    color: white;
+    .logo-image {
+        width: 100%;
+        height: auto;
+    }
+    .bottom-bar {
+        background-color: white;
+    }
+    #registerUsernameInput {
+        display: inline-block;
+        // width: 200px;
+        padding-top: 24px;
+        padding-bottom: 24px;
+        margin: 0; 
+        background-color: transparent;
+    }
+    #setNamesButton {
+        display: inline-block;
+        padding: 18px;
+        border-radius: rem-calc(8px);
+        
+        // border-width: 4px
+        position: relative;
+        top: 6px;
+    }
+}
+
+#conversation-list {
+    color: white;
+    .greetings {
+        padding: rem-calc(16px);
+        // background: rgba(256,256,256,.75);
+        color: white;
+        text-shadow: 0 1px 0 black;
+        span {
+            // padding-left: rem-calc(16px);
+            // padding-right: rem-calc(16px);
         }
-        .log {
+    }
+    .add-friend {
+        
+        padding-top: 16px;
+        padding-bottom: 10px;
+        .row {
+            @extend .white-box;
+            // width: 90%; 
+        }
+        input {
+            // max-width: 80%;
+            display: inline-block;
             margin: 0;
-            padding-top: rem-calc(16px);
-            padding-bottom: rem-calc(16px);
-            color: lightslategrey;
-            // background: blue;
+        }
+        #addFriendButton {
+            // position: relative;
+            // top: 6px;
+            // width: 18%;
+            // display: inline-block;
+            padding: 18px;
+            border-radius: rem-calc(8px);
+            // border-width: 4px
+            position: relative;
+            margin: 0;
+            // top: 8px;
+        }
+    }
+    
+    #contacts-list {
+        display: block;
+        list-style-type: none;
+        margin-left: 0;
+        li {
+            @extend .white-box;
+            // background: url('/img/wallpaper-circles.png') #75b2dd ;
+            color: white;
+            background-blend-mode: hue;
+            &.away {
+               background: transparent;
+               border-width: 4px;
+               border-color: white;
+               border-style: solid; 
+            }
+            list-style-type: none;
+            display: inline-block;
+            width: 100%;
+            // min-height: 2.5em;
+            padding: 32px;
+            .name {
+                font-weight: bold;
+                font-style: 36px;
+                float: left;
+                display: block;
+            }
+            .status {
+                display: block;
+                float: right;
+            }
         }
     }
 }
 
-.back-button {
-    // position: relative;
-    // display: inline-block;
-    // vertical-align: middle;
-    // // cursor: pointer;
-    // width: 20px;
-    // height: 16px;
-    margin-left: 0.25rem;
-    margin-right: 0.5rem;
+#conversation {
+    color: white;
+    .chatArea {
+        // padding-top: rem-calc(64px);
+        margin: 0;
+        overflow: scroll;
+        max-height: 80%;
+        .messages {
+            list-style-type: none;
+            margin: 0;
+            .message {
+                .container {
+                    background: white;
+                    display: inline-block;
+                    padding: rem-calc(8px);
+                    border-radius: rem-calc(8px);
+                    color: black;
+                    box-shadow: 0 2px 5px rgba(0,0,0,.5);
+                    .username {
+                        font-weight: bold;          
+                    } 
+                }
+                display: block;
+                // width: 100%;
+                margin: 0;
+                padding-top: rem-calc(16px);
+                padding-bottom: rem-calc(16px);
+                
+            
+            &.incoming {
+                text-align: left;
+                float: left;
+                .messageBody {
+                        // margin-left: 2em;
+                    }
+            }
+            &.outgoing {
+                float: right;
+                text-align: right;
+                .username {
+                    margin-left: 2em;
+                    //    float: right;
+                }
+                .messageBody {
+                    //    margin-right: 2em;
+                }
+            }
+            
+            }
+            .log {
+                margin: 0;
+                padding-top: rem-calc(16px);
+                padding-bottom: rem-calc(16px);
+                color: lightslategrey;
+                // background: blue;
+            }
+        }
+    }
+    
+    .sendMessageInterface {
+        display: none;
+        &.active {
+            display: block;
+        }
+        #inputMessage {
+            margin: 0;
+        }
+        #sendMessageButton {
+            display: inline-block;
+            padding: 19px;
+            border-radius: rem-calc(8px);
+            margin: 0;
+            
+            // border-width: 4px
+            position: relative;
+            // top: 6px;
+        }
+    }
+    
+    .unavaliableInterface {
+        display: none;
+        &.active {
+            display: block;
+        }
+    }
 }
+
 
 
 .bottom-bar {
     position: absolute;
     width: 100%;
-    background: lightgray;
+    // background: lightgray;
     bottom: 0;
 }
 
@@ -86,8 +238,8 @@
     padding-bottom: 10px;
     
     h2 {
-            font-size: rem-calc(18px);
-        }
+        font-size: rem-calc(18px);
+    }
     .icon {
         display: inline-block;
         color: white;
@@ -100,20 +252,7 @@
     }
 }
 
-.add-friend {
-    padding-top: 16px;
-    padding-bottom: 10px;
-    input {
-        max-width: 80%;
-        display: inline-block;
-    }
-    #addFriendButton {
-        position: relative;
-        top: 6px;
-        width: 18%;
-    }
-    background: lightgray;
-}
+
 
 .your-name {
     text-align: center;
@@ -123,18 +262,19 @@
     }
 }
 
-ul.contacts-list {
-    display: block;
-    list-style-type: none;
-    margin-left: 0;
-    li {
-        list-style-type: none;
-        display: block;
-        .name {
-            float: left;
-        }
-        .status {
-            float: right;
-        }
+#genericAlert {
+    background: url('/img/background-flower-red.png') deepskyblue ;
+    color: white;
+    background-blend-mode: darken;
+    border: none;
+    .close-button {
+        color: white;
     }
+}
+
+#genericError {
+    background: url('/img/wallpaper-flower-purple.png') orangered ;
+    color: white;
+    background-blend-mode: darken;
+    border: none;
 }

@@ -2,6 +2,12 @@ $(function () {
     var FADE_TIME = 150; // ms
     var SERVER_URL = "http://172.26.101.113:3000/";
     // var SERVER_URL = "http://localhost:3000/";
+    
+    var page = {
+        SIGNUP: 0,
+        CONTACTS: 1,
+        CHAT: 2
+    }
 
     // Initialize variables
     var $window = $(window);
@@ -10,6 +16,10 @@ $(function () {
     var $messages = $('.messages'); // Messages area
     var $inputMessage = $('.inputMessage'); // Input message input box
     var $setNamesButton = $('#setNamesButton');
+    
+    newphotoDiv = document.getElementById("newPhoto");
+    
+    
     
     var $chatPage = $('#conversation');
     var $CPsendMessageInterface = $('#conversation.bottom-bar.sendMessageInterface');
@@ -23,7 +33,7 @@ $(function () {
     
     var $loginPage = $('#setup'); // The login page
     
-    
+    var currentPage = page.SIGNUP;
 
     // Prompt for setting a username
     var username;
@@ -45,17 +55,21 @@ $(function () {
             });
         } else {
             console.log("Not logged in.")
-            openLoginPage();
+            openSignupPage();
         }
         
         updateLocationEveryFiveSeconds();
     });
     
     function onLoad() {
-        
+        // displayAlert({
+        //     title: "Login",
+        //     content: "It's happening"
+        // })
     }
     
     function openContactListPage() {
+        currentPage = page.CONTACTS;
         $loginPage.removeClass("active");
         $chatPage.removeClass("active");
         $conversationListPage.addClass("active");
@@ -63,13 +77,15 @@ $(function () {
     }
     
     function openConversationPage() {
+        currentPage = page.CHAT;
         $loginPage.removeClass("active");
         $chatPage.addClass("active");
         $conversationListPage.removeClass("active");
         refreshConversationPage();
     }
     
-    function openLoginPage() {
+    function openSignupPage() {
+        currentPage = page.SIGNUP;
         $loginPage.addClass("active");
         $chatPage.removeClass("active");
         $conversationListPage.removeClass("active");
@@ -77,17 +93,21 @@ $(function () {
     }
     
     function refreshContactListPage() {
-        console.log("Refreshing login page");
+        
         // Refresh current username
+        $('#conversation-list .greetings .name').text( username );
         
         // Refresh current contacts list & avaliability from server
+        console.log( "Getting friendslist");
+        socket.emit("get friendslist");
         // Write contact list
     }
     
     function refreshConversationPage() {
         // update friend name
-        console.log( "Getting friendslist");
-        socket.emit("get friendslist");
+       for( var message in localStorage.messages[currentFriend] ) {
+           
+       }
         // Refresh current username 
         // get conversation from storage
     }
@@ -147,7 +167,7 @@ $(function () {
     //     addMessageElement($el, options);
     // }
     
-    function addChatMessage(data, options) {
+    function addChatMessage(data) {
 
         var $usernameDiv = $('<span class="username"/>')
             .text(data.username)
@@ -160,7 +180,7 @@ $(function () {
             .addClass(typingClass)
             .append($usernameDiv, $messageBodyDiv);
 
-        addMessageElement($messageDiv, options);
+        addMessageElement($messageDiv);
     }
 
 
@@ -199,29 +219,29 @@ $(function () {
     // options.fade - If the element should fade-in (default = true)
     // options.prepend - If the element should prepend
     //   all other messages (default = false)
-    function addMessageElement(el, options) {
+    function addMessageElement(el) {
         var $el = $(el);
 
-        // Setup default options
-        if (!options) {
-            options = {};
-        }
-        if (typeof options.fade === 'undefined') {
-            options.fade = true;
-        }
-        if (typeof options.prepend === 'undefined') {
-            options.prepend = false;
-        }
+        // // Setup default options
+        // if (!options) {
+        //     options = {};
+        // }
+        // if (typeof options.fade === 'undefined') {
+        //     options.fade = true;
+        // }
+        // if (typeof options.prepend === 'undefined') {
+        //     options.prepend = false;
+        // }
 
-        // Apply options
-        if (options.fade) {
-            // $el.hide().fadeIn(FADE_TIME);
-        }
-        if (options.prepend) {
-            $messages.prepend($el);
-        } else {
-            $messages.append($el);
-        }
+        // // Apply options
+        // if (options.fade) {
+        //     // $el.hide().fadeIn(FADE_TIME);
+        // }
+        // if (options.prepend) {
+        //     $messages.prepend($el);
+        // } else {
+        //     $messages.append($el);
+        // }
         $messages[0].scrollTop = $messages[0].scrollHeight;
     }
     
@@ -260,13 +280,18 @@ $(function () {
         if( data.success ) {
             connected = true;
             username = data.username;
+            localStorage.username = username;
             console.log( "Logged in as: " + data.username );
             // Display the welcome message
             openContactListPage();
             
         } else {
-            alert( "Login Fail: " + data.errorMessage);
-            openLoginPage();
+            // alert( "Login Fail: " + data.errorMessage);
+            displayError({
+               title: "Login Failed",
+               content: data.errorMessage
+            });
+            openSignupPage();
         }
     });
     
@@ -318,12 +343,30 @@ $(function () {
             connected = true;
             openContactListPage();
         } else {
-            alert( "Register Fail: " + data.errorMessage );
-            openLoginPage();
+            // alert( "Register Fail: " + data.errorMessage );
+            displayError({
+               title: "Registration Failed",
+               content: data.errorMessage
+            });
+            openSignupPage();
         }
     });
     
     $( document ).ready(function() {
         onLoad();
     });
+    
+    function displayAlert( data ) {
+        console.log( "Opening alert " + data.title );
+        $('#genericAlert .title').html( data.title );
+        $('#genericAlert .content').html( data.content );
+        $('#genericAlert').foundation( 'open');
+    }
+    
+    function displayError( data ) {
+        console.log( "Opening error " + data.title );
+        $('#genericError .title').html( data.title );
+        $('#genericError .content').html( data.content );
+        $('#genericError').foundation( 'open');
+    }
 });
