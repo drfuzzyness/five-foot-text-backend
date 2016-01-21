@@ -82,10 +82,11 @@ $(function () {
     function openContactListPage() {
         console.log( "opening page CONTACTS");
         currentPage = page.CONTACTS;
-        $loginPage.removeClass("active");
-        $chatPage.removeClass("active");
-        $conversationListPage.addClass("active");
         refreshContactListPage();
+        $('#setup').removeClass("active");
+        $('#conversation').removeClass("active");
+        $('#conversation-list').addClass("active");
+        
     }
     
     function openConversationPage() {
@@ -93,9 +94,9 @@ $(function () {
         currentPage = page.CHAT;
         $loginPage.removeClass("active");
         $chatPage.addClass("active");
-        MotionUI.animateIn($chatPage, 'slide-in', function() {
-            console.log('Transition finished!');
-        });
+        // MotionUI.animateIn($chatPage, 'slide-in', function() {
+        //     console.log('Transition finished!');
+        // });
         
         $conversationListPage.removeClass("active");
         refreshConversationPage();
@@ -105,9 +106,9 @@ $(function () {
         console.log( "opening page SIGNUP");
         currentPage = page.SIGNUP;
         $loginPage.addClass("active");
-        MotionUI.animateIn($loginPage, 'slide-in', function() {
-            console.log('Transition finished!');
-        });
+        // MotionUI.animateIn($loginPage, 'slide-in', function() {
+        //     console.log('Transition finished!');
+        // });
         $chatPage.removeClass("active");
         $conversationListPage.removeClass("active");
         refreshLoginPage();
@@ -174,15 +175,10 @@ $(function () {
         message = cleanInput(message);
         // if there is a non-empty message and a socket connection
         if (message) {
-            // $inputMessage.val('');
-            // addChatMessage({
-            //     username: username,
-            //     friend: friend,
-            //     location: location,
-            //     message: message
-            // });
-            // tell server to execute 'new message' and send along one parameter
-            // alert( message );
+            addChatMessage({
+                username: "",
+                message: message
+            });
             socket.emit('send message', {
                 message: message,
                 targetUser: currentFriend
@@ -359,15 +355,26 @@ $(function () {
             console.log("You have no friends.");
             
         } else {
-            for( var friend in data ){
+            for( var friendIndex = 0; friendIndex < data.length; friendIndex++ ){
+                var friend = data[friendIndex];
                 console.log( "Got friend " + friend.friendName );
                     var $usernameDiv = $('<span class="name"/>')
-                        .text( friend.friendName )
-                    var $statusDiv = $('<span class="status">')
-                        .text( friend.friendAvaliability );
+                        .text( friend.friendName );
+                    var contactClasses = "contact ";
+                    if( friend.friendAvaliability ) {
+                        var $statusDiv = $('<span class="status">')
+                        .text( "in your area" );
+                        contactClasses += "avaliable";
+                        
+                    } else {
+                        var $statusDiv = $('<span class="status">')
+                        .text( "away" );
+                        contactClasses += "away";
+                    }
+                    
 
                     // var typingClass = data.typing ? 'typing' : '';
-                    var $contactLi = $('<li class="contact"/>')
+                    var $contactLi = $('<li class="' + contactClasses + '"/>')
                         .data('friendName', friend.friendName)
                         .append($usernameDiv, $statusDiv)
                         .click(function() {

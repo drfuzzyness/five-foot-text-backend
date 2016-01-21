@@ -116,6 +116,9 @@ body {
                border-color: white;
                border-style: solid; 
             }
+            &.avaliable {
+                background: url('/img/wallpaper-circles.png') red;
+            }
             list-style-type: none;
             display: inline-block;
             width: 100%;

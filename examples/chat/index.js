@@ -20,8 +20,8 @@ io.on('connection', function (socket) {
 
     console.log("New user has connected.");
     socket.on('register', function (data) {
-        usernameIsAvailable(data.username, function(available) { 
-            if (available){
+        usernameIsAvailable(data.username, function (available) {
+            if (available) {
                 console.log("New user registered in with username " + data.username);
                 var newUser = {
                     username: data.username,
@@ -46,8 +46,8 @@ io.on('connection', function (socket) {
     });
 
     socket.on('login', function (data) {
-        usernameIsAvailable(data.username, function(available) { 
-            if (!available){
+        usernameIsAvailable(data.username, function (available) {
+            if (!available) {
                 console.log("New user logged in with username " + data.username);
                 socket.emit('login result', {
                     username: socket.username,
@@ -65,7 +65,7 @@ io.on('connection', function (socket) {
     });
 
     socket.on('send message', function (data) {
-        console.log(socket.username + " sent a message " + data.message + " from location (" + socket.lat + "),(" + socket.lng + ")" );
+        console.log(socket.username + " sent a message " + data.message + " from location (" + socket.lat + "),(" + socket.lng + ")");
         socket.to(data.friend).emit('incoming message', {
             username: socket.username,
             friend: socket.friend,
@@ -78,11 +78,11 @@ io.on('connection', function (socket) {
     socket.on('update location', function (data) {
         socket.lat = data.lat;
         socket.lng = data.lng;
-        getUserIndex(socket.username, function(index) { 
-            if( index == -1) {
+        getUserIndex(socket.username, function (index) {
+            if (index == -1) {
                 return;
             }
-            var currentUserInfoUpdated = {username: "", lat: 0.0, lng: 0.0, friends: []};
+            var currentUserInfoUpdated = { username: "", lat: 0.0, lng: 0.0, friends: [] };
             var currentUserInfoUpdated;
             client.lindex('users-data', index, function (err, reply) {
                 currentUserInfoOld = JSON.parse(reply);
@@ -90,25 +90,25 @@ io.on('connection', function (socket) {
                 currentUserInfoUpdated.lat = data.lat;
                 currentUserInfoUpdated.lng = data.lng;
                 var sendme = JSON.stringify(currentUserInfoUpdated);
-                client.lset('users-data', index, sendme , function(err, reply) { 
-                    console.log(socket.username + " has updated location at (" + data.lat + "),(" + data.lng + ")");
+                client.lset('users-data', index, sendme, function (err, reply) {
+                    // console.log(socket.username + " has updated location at (" + data.lat + "),(" + data.lng + ")");
                 });
             });
-            
+
 
         });
-        
+
     });
 
-    socket.on('add friend', function (data){
-        getUserIndex(socket.username, function(index) { 
-            var currentUserInfoUpdated = {username: "", lat: 0.0, lng: 0.0, friends: []};
+    socket.on('add friend', function (data) {
+        getUserIndex(socket.username, function (index) {
+            var currentUserInfoUpdated = { username: "", lat: 0.0, lng: 0.0, friends: [] };
             client.lindex('users-data', index, function (err, reply) {
                 currentUserInfoOld = JSON.parse(reply);
                 currentUserInfoUpdated = currentUserInfoOld;
-                if (index != -1){
-                    getUserIndex(data.friend, function(friendIndex) {
-                        if( friendIndex == -1 ) {
+                if (index != -1) {
+                    getUserIndex(data.friend, function (friendIndex) {
+                        if (friendIndex == -1) {
                             socket.emit('add friend result', {
                                 friendAdded: false,
                                 errorMessage: "Friend username could not be found"
@@ -116,8 +116,8 @@ io.on('connection', function (socket) {
                         } else {
                             currentUserInfoUpdated.friends.push(data.friend);
                             var sendme = JSON.stringify(currentUserInfoUpdated);
-                            console.log("User and added to friends list");
-                            client.lset('users-data', index, sendme, function(err, reply) {
+                            console.log("User " + data.friend + " and added to friends list");
+                            client.lset('users-data', index, sendme, function (err, reply) {
                                 socket.emit('add friend result', {
                                     friendAdded: true,
                                     errorMessage: null
@@ -137,36 +137,51 @@ io.on('connection', function (socket) {
     });
 
     socket.on('get friendslist', function (data) {
-        getUserIndex(socket.username, function(index) { 
+        getUserIndex(socket.username, function (index) {
             client.lindex('users-data', index, function (err, reply) {
-                currentUser = JSON.parse(reply);
-                console.log(socket.username + " has " + currentUser.friends.length + " friends");
+                var currentUser = JSON.parse(reply);
+                // console.log(socket.username + " has " + currentUser.friends.length + " friends");
                 var friends = currentUser.friends;
-                var compiledFriendsList = [];
-                client.lrange('users-data', 0, ARBITRARY_HIGH_NUMBER, function(err1, allUserArray){
-                    for( var userJson in allUserArray ) {
-                        var thisFriend = JSON.parse( userJson );
-                        for( var thisFriendName in friends ) {
-                            if( thisFriend.username == thisFriendName ) {
-                                console.log( "friend " + thisFriendName + " found");
-                                var distance = getDistanceFromLatLonInKm( 
-                                                    currentUser.lat, currentUser.lon,
-                                                    thisFriend.lat, thisFriend.lon );
+
+                client.lrange('users-data', 0, ARBITRARY_HIGH_NUMBER, function (err1, allUserArray) {
+                    var compiledFriendsList = [];
+                    // for (var userJson in allUserArray) {
+                    for (var userIndex = 0; userIndex < allUserArray.length; userIndex++ ) {
+                        // console.log( "analyzing " + allUserArray[userIndex] + " against " + JSON.stringify(friends) );
+                        var thisFriend = JSON.parse(allUserArray[userIndex]);
+                        for ( var friendIndex = 0; friendIndex < friends.length; friendIndex++) {
+                            var thisFriendName = friends[friendIndex]; 
+                            // console.log( "comparing " + thisFriend.username + " to " + thisFriendName );
+                            if (thisFriend.username == thisFriendName) {
+                                // console.log("friend " + thisFriendName + " found");
+                                console.log(
+                                    parseFloat(currentUser.lat) + "," + parseFloat(currentUser.lng) + "," +
+                                    parseFloat(thisFriend.lat) + "," + parseFloat(thisFriend.lng) );
+                                var distance = getDistanceFromLatLonInKm(
+                                    parseFloat(currentUser.lat), parseFloat(currentUser.lng),
+                                    parseFloat(thisFriend.lat), parseFloat(thisFriend.lng));
                                 var available = distance < AVALIABILITY_DISTANCE;
-                                if (distance < AVALIABILITY_DISTANCE) { available = true;} else { available = false;}
-                                compiledFriendsList.push( {
+                                if (distance < AVALIABILITY_DISTANCE) {
+                                    available = true;
+                                } else {
+                                    available = false;
+                                }
+                                // console.log( thisFriend.username + ", " + available );
+                                console.log( "distance " + distance + " of " + thisFriendName );
+                                compiledFriendsList.push({
                                     friendName: thisFriend.username,
                                     friendAvaliability: available
                                 });
+                                // console.log( "cfl is now " + compiledFriendsList );
                             }
-                            
+
                         }
 
                     }
-                    console.log( JSON.stringify(compiledFriendsList) );
-                    socket.emit('friendslist', compiledFriendsList );
+                    console.log(JSON.stringify(compiledFriendsList));
+                    socket.emit('friendslist', compiledFriendsList);
                 });
-                for (var i=0; i<friends.length; i++){
+                for (var i = 0; i < friends.length; i++) {
                     // var currentFriendLat;
                     // var currentFriendLat;
                     // getUserIndex(friends[i], function(index) { 
@@ -181,9 +196,9 @@ io.on('connection', function (socket) {
                     // });
                 }
                 console.log(currentUser.friends);
-                for (var i=0; i<currentUser.friends.length; i++){
+                for (var i = 0; i < currentUser.friends.length; i++) {
                     console.log(currentUser.friends[i]);
-                    isFriendAccessible(currentUser.friends[i], function(accessible){
+                    isFriendAccessible(currentUser.friends[i], function (accessible) {
                         if (accessible) {
                             friends.push({
                                 friendName: currentUser.friends[i],
@@ -203,14 +218,14 @@ io.on('connection', function (socket) {
         });
     });
 
-    function getUserIndex(username, cb){
+    function getUserIndex(username, cb) {
         var numUsers;
         client.llen('users-data', function (err, reply) {
             numUsers = reply;
-            client.lrange('users-data', 0, ARBITRARY_HIGH_NUMBER, function( err, reply ) {
-                for (var i = 0; i < numUsers; i++){
+            client.lrange('users-data', 0, ARBITRARY_HIGH_NUMBER, function (err, reply) {
+                for (var i = 0; i < numUsers; i++) {
                     var thisUser = JSON.parse(reply[i]);
-                    if (username == thisUser.username){
+                    if (username == thisUser.username) {
                         cb(i);
                         return;
                     }
@@ -218,11 +233,11 @@ io.on('connection', function (socket) {
                 cb(-1);
                 return;
             });
-        });    
+        });
     }
 
     function isValidFriendAndReturnAsUserObject(friend) {
-        for (var i=0; i<users.length; i++) {
+        for (var i = 0; i < users.length; i++) {
             console.log(users[i].username);
             if ((socket.username != friend) && (friend === users[i].username)) {
                 return user;
@@ -232,11 +247,11 @@ io.on('connection', function (socket) {
     }
 
     function isFriendAccessible(friend, cb) {
-        getUserIndex(friend, function(index) { 
+        getUserIndex(friend, function (index) {
             client.lindex('users-data', index, function (err, reply) {
                 friend_lat = reply.lat;
                 friend_lng = reply.lng;
-                if (getDistanceFromLatLonInKm(friend_lat, friend_lng, socket.lat, socket.lng) < 10){
+                if (getDistanceFromLatLonInKm(friend_lat, friend_lng, socket.lat, socket.lng) < 10) {
                     cb(true);
                     return;
                 } else {
@@ -251,7 +266,7 @@ io.on('connection', function (socket) {
         console.log(socket.username + " is trying to add " + friend + " as a friend.");
         var potentialFriend = isValidFriendAndReturnAsUserObject(friend);
         if (potentialFriend !== null) {
-            getUserByUsername(socket.username).friends.push(friend); 
+            getUserByUsername(socket.username).friends.push(friend);
         } else {
             console.log("Could not find person with that username!");
         }
@@ -261,42 +276,42 @@ io.on('connection', function (socket) {
         var numUsers;
         client.llen('users-data', function (err, reply) {
             numUsers = reply;
-            for (var i=0; i<numUsers; i++){
+            for (var i = 0; i < numUsers; i++) {
                 client.lindex('users-data', i, function (err, reply) {
                     var currentUser = JSON.parse(reply);
-                    if (username == currentUser.username){
+                    if (username == currentUser.username) {
                         cb(false);
                     }
                 });
             }
             cb(true);
-        }); 
+        });
     }
 
     function isValidFriend(data) {
         console.log(socket.username + " is trying to add " + data.friend);
-        if (socket.username != data.friend){
+        if (socket.username != data.friend) {
             return true;
         } else {
             return false;
         }
     }
 
-    function getDistanceFromLatLonInKm(lat1,lon1,lat2,lon2) {
-        var R = 6371; 
-        var dLat = deg2rad(lat2-lat1);  
-        var dLon = deg2rad(lon2-lon1); 
-        var a = 
-        Math.sin(dLat/2) * Math.sin(dLat/2) +
-        Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) * 
-        Math.sin(dLon/2) * Math.sin(dLon/2)
-        ; 
-        var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)); 
-        var d = R * c; 
+    function getDistanceFromLatLonInKm(lat1, lon1, lat2, lon2) {
+        var R = 6371;
+        var dLat = deg2rad(lat2 - lat1);
+        var dLon = deg2rad(lon2 - lon1);
+        var a =
+            Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+            Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) *
+            Math.sin(dLon / 2) * Math.sin(dLon / 2)
+            ;
+        var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        var d = R * c;
         return d;
     }
 
     function deg2rad(deg) {
-      return deg * (Math.PI/180)
+        return deg * (Math.PI / 180)
     }
 });

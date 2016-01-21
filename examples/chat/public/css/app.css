@@ -474,6 +474,8 @@ body {
         border-width: 4px;
         border-color: white;
         border-style: solid; }
+      #conversation-list #contacts-list li.avaliable {
+        background: url("/img/wallpaper-circles.png") red; }
       #conversation-list #contacts-list li .name {
         font-weight: bold;
         font-style: 36px;
