@@ -13,7 +13,7 @@
 
 <body>
     <ul id="pages">
-        <li id="setup" class="page active">
+        <li id="setup" class="page">
             <div class="row">
                 <img class="logo-image" src="img/adam af.png" alt="">
             </div>
@@ -51,7 +51,7 @@
                         </div>
                     </div>
                     <div class="column text-right shrink">
-                        <div class="icon">
+                        <div class="icon" data-toggle="user-options" >
                             <i class="material-icons">more_vert</i>
                         </div>
                     </div>
@@ -99,7 +99,7 @@
             <div class="topbar">
                 <div class="row align-justify">
                     <div class="column">
-                        <div class="icon">
+                        <div class="icon" id="convo-back">
                             <i class="material-icons">arrow_back</i>
                         </div>
                         <div class="icon">
@@ -198,7 +198,7 @@
         </button>
     </div>
     
-    <div class="reveal" id="genericAlert" data-reveal>
+    <div class="reveal" id="genericAlert" data-reveal data-animation-in="FFT-popup-in">
         <h2 class="title">Alert!</h2>
         <div class="content">
             <p>Something cool happened, maybe good, maybe bad, maybe some cool programming thing.</p>
@@ -207,12 +207,12 @@
             Ok
         </button>-->
         
-        <button class="close-button" data-close aria-label="Close reveal" type="button">
+        <button class="close-button" data-close aria-label="Close reveal" type="button" >
             <span aria-hidden="true">&times;</span>
         </button>
     </div>
     
-    <div class="reveal" id="genericError" data-reveal>
+    <div class="reveal" id="genericError" data-reveal data-animation-in="FFT-popup-in">
         <h2 class="title">Error!</h2>
         <div class="content">
             <p>Something bad happened. You should try that again or restart the app.</p>
@@ -225,16 +225,29 @@
             <span aria-hidden="true">&times;</span>
         </button>
     </div>
+    
+    <div class="reveal" id="user-options" data-reveal>
+        <br>
+        <br>
+        <button id="logoutButton" class="button wide">
+            Logout and Erase Messages
+        </button>
+        
+        <button class="close-button" data-close aria-label="Close reveal" type="button">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
 
 
 
 
     <script src="bower_components/jquery/dist/jquery.js"></script>
+    <script src="bower_components/motion-ui/dist/motion-ui.min.js"></script>
     <!--<script src="bower_components/what-input/what-input.js"></script>-->
     <script src="bower_components/foundation-sites/dist/foundation.js"></script>
     <script src="js/min/app-min.js"></script>
-    <script src="http://172.26.101.113:3000/socket.io/socket.io.js"></script>
-    <!--<script src="/socket.io/socket.io.js"></script>-->
+    <!--<script src="http://172.26.101.113:3000/socket.io/socket.io.js"></script>-->
+    <script src="http://localhost:3000/socket.io/socket.io.js"></script>
     <script src="js/main.js"></script>
     <!--<script src="js/main-dan.js"></script>-->
 

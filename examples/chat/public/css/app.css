@@ -5,7 +5,7 @@
  * foundation.zurb.com
  * Licensed under MIT Open Source
  */
-.slide-in-down.mui-enter, .slide-in-left.mui-enter, .slide-in-up.mui-enter, .slide-in-right.mui-enter, .slide-out-down.mui-leave, .slide-out-right.mui-leave, .slide-out-up.mui-leave, .slide-out-left.mui-leave, .fade-in.mui-enter, .fade-out.mui-leave, .hinge-in-from-top.mui-enter, .hinge-in-from-right.mui-enter, .hinge-in-from-bottom.mui-enter, .hinge-in-from-left.mui-enter, .hinge-in-from-middle-x.mui-enter, .hinge-in-from-middle-y.mui-enter, .hinge-out-from-top.mui-leave, .hinge-out-from-right.mui-leave, .hinge-out-from-bottom.mui-leave, .hinge-out-from-left.mui-leave, .hinge-out-from-middle-x.mui-leave, .hinge-out-from-middle-y.mui-leave, .scale-in-up.mui-enter, .scale-in-down.mui-enter, .scale-out-up.mui-leave, .scale-out-down.mui-leave, .spin-in.mui-enter, .spin-out.mui-leave, .spin-in-ccw.mui-enter, .spin-out-ccw.mui-leave {
+.slide-in-down.mui-enter, .slide-in-left.mui-enter, .slide-in-up.mui-enter, .slide-in-right.mui-enter, .slide-out-down.mui-leave, .slide-out-right.mui-leave, .slide-out-up.mui-leave, .slide-out-left.mui-leave, .fade-in.mui-enter, .fade-out.mui-leave, .hinge-in-from-top.mui-enter, .hinge-in-from-right.mui-enter, .hinge-in-from-bottom.mui-enter, .hinge-in-from-left.mui-enter, .hinge-in-from-middle-x.mui-enter, .hinge-in-from-middle-y.mui-enter, .hinge-out-from-top.mui-leave, .hinge-out-from-right.mui-leave, .hinge-out-from-bottom.mui-leave, .hinge-out-from-left.mui-leave, .hinge-out-from-middle-x.mui-leave, .hinge-out-from-middle-y.mui-leave, .scale-in-up.mui-enter, .scale-in-down.mui-enter, .scale-out-up.mui-leave, .scale-out-down.mui-leave, .spin-in.mui-enter, .spin-out.mui-leave, .spin-in-ccw.mui-enter, .spin-out-ccw.mui-leave, .FFT-popup-in.mui-enter {
   transition-duration: 500ms;
   transition-timing-function: linear; }
 
@@ -537,7 +537,7 @@ body {
       display: block; }
 
 .bottom-bar {
-  position: absolute;
+  position: fixed;
   width: 100%;
   bottom: 0; }
 
@@ -561,18 +561,38 @@ body {
     top: 6px; }
 
 #genericAlert {
-  background: url("/img/background-flower-red.png") deepskyblue;
-  color: white;
+  background: white;
+  color: black;
   background-blend-mode: darken;
   border: none; }
+  #genericAlert h2 {
+    color: black; }
   #genericAlert .close-button {
     color: white; }
 
 #genericError {
-  background: url("/img/wallpaper-flower-purple.png") orangered;
-  color: white;
+  background: white;
+  color: black;
   background-blend-mode: darken;
   border: none; }
+  #genericError h2 {
+    color: red; }
+
+.FFT-popup-in.mui-enter {
+  transition-duration: 0.1s;
+  transition-timing-function: easeInOut;
+  transition-delay: 0;
+  transform: translateY(-100%);
+  transition-property: transform, opacity;
+  opacity: 0;
+  backface-visibility: hidden; }
+
+.FFT-popup-in.mui-enter.mui-enter-active {
+  transform: translateY(0);
+  opacity: 1; }
+
+.button.wide {
+  width: 100%; }
 
 /*! normalize.css v3.0.3 | MIT License | github.com/necolas/normalize.css */
 /**

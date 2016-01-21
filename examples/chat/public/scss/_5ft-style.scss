@@ -225,7 +225,7 @@ body {
 
 
 .bottom-bar {
-    position: absolute;
+    position: fixed;
     width: 100%;
     // background: lightgray;
     bottom: 0;
@@ -263,8 +263,11 @@ body {
 }
 
 #genericAlert {
-    background: url('/img/background-flower-red.png') deepskyblue ;
-    color: white;
+    background: white ;
+    h2 {
+        color: black;
+    }
+    color: black;
     background-blend-mode: darken;
     border: none;
     .close-button {
@@ -273,8 +276,27 @@ body {
 }
 
 #genericError {
-    background: url('/img/wallpaper-flower-purple.png') orangered ;
-    color: white;
+    background: white ;
+    h2 {
+        color: red;
+    }
+    color: black;
     background-blend-mode: darken;
     border: none;
+}
+
+.FFT-popup-in {
+    @include mui-slide(
+        in,
+        down,
+        $amount: 100%,
+        $fade: true,
+        $duration: .1s,
+        $timing: easeInOut,
+        $delay: 0
+    )
+}
+
+.button.wide {
+    width: 100%;
 }

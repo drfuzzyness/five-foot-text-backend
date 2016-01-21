@@ -1,7 +1,7 @@
 $(function () {
     var FADE_TIME = 150; // ms
-    var SERVER_URL = "http://172.26.101.113:3000/";
-    // var SERVER_URL = "http://localhost:3000/";
+    // var SERVER_URL = "http://172.26.101.113:3000/";
+    var SERVER_URL = "http://localhost:3000/";
     
     var page = {
         SIGNUP: 0,
@@ -41,8 +41,24 @@ $(function () {
     // var friends = [];
     var connected = false;
     // var $currentInput = $usernameInput.focus();
-
+    
+    function onLoad() {
+        console.log( "HEY LISTEN");
+        console.log( io );
+        if( io == undefined ) {
+            displayError({
+               title: "Could not connect to server",
+               content: "<p>You need to restart the app</p><p><button class='button' onclick='location.reload()'><i class='material-icons'>refresh</i></button></p>"
+            });
+        }
+    }
+    
+    $( document ).ready(function() {
+        onLoad();
+    });
+    
     var socket = io.connect( SERVER_URL );
+    
     
     socket.on('connect', function() {
        // deactivate no-connection errors
@@ -61,14 +77,10 @@ $(function () {
         updateLocationEveryFiveSeconds();
     });
     
-    function onLoad() {
-        // displayAlert({
-        //     title: "Login",
-        //     content: "It's happening"
-        // })
-    }
+    
     
     function openContactListPage() {
+        console.log( "opening page CONTACTS");
         currentPage = page.CONTACTS;
         $loginPage.removeClass("active");
         $chatPage.removeClass("active");
@@ -77,19 +89,35 @@ $(function () {
     }
     
     function openConversationPage() {
+        console.log( "opening page CHAT");
         currentPage = page.CHAT;
         $loginPage.removeClass("active");
         $chatPage.addClass("active");
+        MotionUI.animateIn($chatPage, 'slide-in', function() {
+            console.log('Transition finished!');
+        });
+        
         $conversationListPage.removeClass("active");
         refreshConversationPage();
     }
     
     function openSignupPage() {
+        console.log( "opening page SIGNUP");
         currentPage = page.SIGNUP;
         $loginPage.addClass("active");
+        MotionUI.animateIn($loginPage, 'slide-in', function() {
+            console.log('Transition finished!');
+        });
         $chatPage.removeClass("active");
         $conversationListPage.removeClass("active");
         refreshLoginPage();
+    }
+    
+    function logout() {
+        localStorage.username = undefined;
+        username = undefined;
+        connected = false;
+        openSignupPage();
     }
     
     function refreshContactListPage() {
@@ -105,9 +133,10 @@ $(function () {
     
     function refreshConversationPage() {
         // update friend name
-       for( var message in localStorage.messages[currentFriend] ) {
+        $('.messages .info .name').text( currentFriend );
+    //    for( var message in localStorage.messages[currentFriend] ) {
            
-       }
+    //    }
         // Refresh current username 
         // get conversation from storage
     }
@@ -129,9 +158,9 @@ $(function () {
     
     function onAddFriend() {
         var friend = cleanInput($('#friendInput').val().trim());
-        console.log( "Adding Friend: " + friend );
+       
         if( friend ) {
-            
+            console.log( "Adding Friend: " + friend );
             socket.emit( "add friend", {
                 friend: friend
             });
@@ -268,12 +297,25 @@ $(function () {
         }  
     });
     
+    $('#convo-back').click(function(){
+       openContactListPage(); 
+    });
+    
+    $("#registerUsernameInput").submit(function() {
+        
+    })
+    
     $("#addFriendButton").click(function() {
         onAddFriend();
     });
     
     $("#refreshFriendsList").click(function(){
-       refreshConversationPage(); 
+       refreshContactListPage(); 
+    });
+    
+    $("#logoutButton").click(function(){
+        console.log("Logging out");
+        logout();
     });
     
     socket.on('login result', function (data) {
@@ -286,12 +328,20 @@ $(function () {
             openContactListPage();
             
         } else {
-            // alert( "Login Fail: " + data.errorMessage);
+            console.log( "login failed " + data );
             displayError({
-               title: "Login Failed",
+               title: "Login Failure",
                content: data.errorMessage
             });
             openSignupPage();
+            
+            // ==========
+            // connected = true;
+            // username = data.username;
+            // localStorage.username = username;
+            // console.log( "Logged in as: " + data.username );
+            // // Display the welcome message
+            // openContactListPage();
         }
     });
     
@@ -300,9 +350,12 @@ $(function () {
     });
     
     socket.on( 'friendslist', function(data) {
+        
+        // data = JSON.parse(data);
         $CLfriendList.empty();
-        console.log( data );
-        if( data.size() == 0 ) {
+        console.log( "got datas " + JSON.stringify(data) + " of " + typeof data );
+        // console.log( "got friendslist " + JSON.parse(data) );
+        if( data.length == 0 ) {
             console.log("You have no friends.");
             
         } else {
@@ -327,6 +380,20 @@ $(function () {
             } 
         }
     });
+    
+    socket.on('add friend result', function(data){
+        if( !data.friendAdded ) {
+            displayAlert({
+               title: "Friend not found",
+               content: data.errorMessage
+            });
+        } else {
+            displayAlert({
+               title: "Friend added!",
+               content: ""
+            });
+        }
+    });
 
     // Whenever the server emits 'new message', update the chat body
     socket.on('incoming message', function (data) {
@@ -343,9 +410,10 @@ $(function () {
             connected = true;
             openContactListPage();
         } else {
+            console.log( "register failed " + data );
             // alert( "Register Fail: " + data.errorMessage );
             displayError({
-               title: "Registration Failed",
+               title: "Registration Failure",
                content: data.errorMessage
             });
             openSignupPage();
@@ -365,6 +433,7 @@ $(function () {
     
     function displayError( data ) {
         console.log( "Opening error " + data.title );
+        
         $('#genericError .title').html( data.title );
         $('#genericError .content').html( data.content );
         $('#genericError').foundation( 'open');
