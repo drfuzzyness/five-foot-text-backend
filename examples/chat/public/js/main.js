@@ -1,7 +1,13 @@
 $(function () {
     var FADE_TIME = 150; // ms
-    var SERVER_URL = "http://172.26.101.113:3000/";
-    // var SERVER_URL = "http://localhost:3000/";
+    // var SERVER_URL = "http://172.26.101.113:3000/";
+    var SERVER_URL = "http://localhost:3000/";
+    
+    var page = {
+        SIGNUP: 0,
+        CONTACTS: 1,
+        CHAT: 2
+    }
 
     // Initialize variables
     var $window = $(window);
@@ -10,6 +16,10 @@ $(function () {
     var $messages = $('.messages'); // Messages area
     var $inputMessage = $('.inputMessage'); // Input message input box
     var $setNamesButton = $('#setNamesButton');
+    
+    newphotoDiv = document.getElementById("newPhoto");
+    
+    
     
     var $chatPage = $('#conversation');
     var $CPsendMessageInterface = $('#conversation.bottom-bar.sendMessageInterface');
@@ -23,7 +33,7 @@ $(function () {
     
     var $loginPage = $('#setup'); // The login page
     
-    
+    var currentPage = page.SIGNUP;
 
     // Prompt for setting a username
     var username;
@@ -31,8 +41,24 @@ $(function () {
     // var friends = [];
     var connected = false;
     // var $currentInput = $usernameInput.focus();
-
+    
+    function onLoad() {
+        console.log( "HEY LISTEN");
+        console.log( io );
+        if( io == undefined ) {
+            displayError({
+               title: "Could not connect to server",
+               content: "<p>You need to restart the app</p><p><button class='button' onclick='location.reload()'><i class='material-icons'>refresh</i></button></p>"
+            });
+        }
+    }
+    
+    $( document ).ready(function() {
+        onLoad();
+    });
+    
     var socket = io.connect( SERVER_URL );
+    
     
     socket.on('connect', function() {
        // deactivate no-connection errors
@@ -45,49 +71,73 @@ $(function () {
             });
         } else {
             console.log("Not logged in.")
-            openLoginPage();
+            openSignupPage();
         }
         
         updateLocationEveryFiveSeconds();
     });
     
-    function onLoad() {
+    
+    
+    function openContactListPage() {
+        console.log( "opening page CONTACTS");
+        currentPage = page.CONTACTS;
+        refreshContactListPage();
+        $('#setup').removeClass("active");
+        $('#conversation').removeClass("active");
+        $('#conversation-list').addClass("active");
         
     }
     
-    function openContactListPage() {
-        $loginPage.removeClass("active");
-        $chatPage.removeClass("active");
-        $conversationListPage.addClass("active");
-        refreshContactListPage();
-    }
-    
     function openConversationPage() {
+        console.log( "opening page CHAT");
+        currentPage = page.CHAT;
         $loginPage.removeClass("active");
         $chatPage.addClass("active");
+        // MotionUI.animateIn($chatPage, 'slide-in', function() {
+        //     console.log('Transition finished!');
+        // });
+        
         $conversationListPage.removeClass("active");
         refreshConversationPage();
     }
     
-    function openLoginPage() {
+    function openSignupPage() {
+        console.log( "opening page SIGNUP");
+        currentPage = page.SIGNUP;
         $loginPage.addClass("active");
+        // MotionUI.animateIn($loginPage, 'slide-in', function() {
+        //     console.log('Transition finished!');
+        // });
         $chatPage.removeClass("active");
         $conversationListPage.removeClass("active");
         refreshLoginPage();
     }
     
+    function logout() {
+        localStorage.username = undefined;
+        username = undefined;
+        connected = false;
+        openSignupPage();
+    }
+    
     function refreshContactListPage() {
-        console.log("Refreshing login page");
+        
         // Refresh current username
+        $('#conversation-list .greetings .name').text( username );
         
         // Refresh current contacts list & avaliability from server
+        console.log( "Getting friendslist");
+        socket.emit("get friendslist");
         // Write contact list
     }
     
     function refreshConversationPage() {
         // update friend name
-        console.log( "Getting friendslist");
-        socket.emit("get friendslist");
+        $('.messages .info .name').text( currentFriend );
+    //    for( var message in localStorage.messages[currentFriend] ) {
+           
+    //    }
         // Refresh current username 
         // get conversation from storage
     }
@@ -109,9 +159,9 @@ $(function () {
     
     function onAddFriend() {
         var friend = cleanInput($('#friendInput').val().trim());
-        console.log( "Adding Friend: " + friend );
+       
         if( friend ) {
-            
+            console.log( "Adding Friend: " + friend );
             socket.emit( "add friend", {
                 friend: friend
             });
@@ -125,15 +175,10 @@ $(function () {
         message = cleanInput(message);
         // if there is a non-empty message and a socket connection
         if (message) {
-            // $inputMessage.val('');
-            // addChatMessage({
-            //     username: username,
-            //     friend: friend,
-            //     location: location,
-            //     message: message
-            // });
-            // tell server to execute 'new message' and send along one parameter
-            // alert( message );
+            addChatMessage({
+                username: "",
+                message: message
+            });
             socket.emit('send message', {
                 message: message,
                 targetUser: currentFriend
@@ -147,7 +192,7 @@ $(function () {
     //     addMessageElement($el, options);
     // }
     
-    function addChatMessage(data, options) {
+    function addChatMessage(data) {
 
         var $usernameDiv = $('<span class="username"/>')
             .text(data.username)
@@ -160,7 +205,7 @@ $(function () {
             .addClass(typingClass)
             .append($usernameDiv, $messageBodyDiv);
 
-        addMessageElement($messageDiv, options);
+        addMessageElement($messageDiv);
     }
 
 
@@ -199,29 +244,29 @@ $(function () {
     // options.fade - If the element should fade-in (default = true)
     // options.prepend - If the element should prepend
     //   all other messages (default = false)
-    function addMessageElement(el, options) {
+    function addMessageElement(el) {
         var $el = $(el);
 
-        // Setup default options
-        if (!options) {
-            options = {};
-        }
-        if (typeof options.fade === 'undefined') {
-            options.fade = true;
-        }
-        if (typeof options.prepend === 'undefined') {
-            options.prepend = false;
-        }
+        // // Setup default options
+        // if (!options) {
+        //     options = {};
+        // }
+        // if (typeof options.fade === 'undefined') {
+        //     options.fade = true;
+        // }
+        // if (typeof options.prepend === 'undefined') {
+        //     options.prepend = false;
+        // }
 
-        // Apply options
-        if (options.fade) {
-            // $el.hide().fadeIn(FADE_TIME);
-        }
-        if (options.prepend) {
-            $messages.prepend($el);
-        } else {
-            $messages.append($el);
-        }
+        // // Apply options
+        // if (options.fade) {
+        //     // $el.hide().fadeIn(FADE_TIME);
+        // }
+        // if (options.prepend) {
+        //     $messages.prepend($el);
+        // } else {
+        //     $messages.append($el);
+        // }
         $messages[0].scrollTop = $messages[0].scrollHeight;
     }
     
@@ -248,25 +293,51 @@ $(function () {
         }  
     });
     
+    $('#convo-back').click(function(){
+       openContactListPage(); 
+    });
+    
+    $("#registerUsernameInput").submit(function() {
+        
+    })
+    
     $("#addFriendButton").click(function() {
         onAddFriend();
     });
     
     $("#refreshFriendsList").click(function(){
-       refreshConversationPage(); 
+       refreshContactListPage(); 
+    });
+    
+    $("#logoutButton").click(function(){
+        console.log("Logging out");
+        logout();
     });
     
     socket.on('login result', function (data) {
         if( data.success ) {
             connected = true;
             username = data.username;
+            localStorage.username = username;
             console.log( "Logged in as: " + data.username );
             // Display the welcome message
             openContactListPage();
             
         } else {
-            alert( "Login Fail: " + data.errorMessage);
-            openLoginPage();
+            console.log( "login failed " + data );
+            displayError({
+               title: "Login Failure",
+               content: data.errorMessage
+            });
+            openSignupPage();
+            
+            // ==========
+            // connected = true;
+            // username = data.username;
+            // localStorage.username = username;
+            // console.log( "Logged in as: " + data.username );
+            // // Display the welcome message
+            // openContactListPage();
         }
     });
     
@@ -275,21 +346,35 @@ $(function () {
     });
     
     socket.on( 'friendslist', function(data) {
+        
+        // data = JSON.parse(data);
         $CLfriendList.empty();
-        console.log( data );
-        if( data.size() == 0 ) {
+        console.log( "got datas " + JSON.stringify(data) + " of " + typeof data );
+        // console.log( "got friendslist " + JSON.parse(data) );
+        if( data.length == 0 ) {
             console.log("You have no friends.");
             
         } else {
-            for( var friend in data ){
+            for( var friendIndex = 0; friendIndex < data.length; friendIndex++ ){
+                var friend = data[friendIndex];
                 console.log( "Got friend " + friend.friendName );
                     var $usernameDiv = $('<span class="name"/>')
-                        .text( friend.friendName )
-                    var $statusDiv = $('<span class="status">')
-                        .text( friend.friendAvaliability );
+                        .text( friend.friendName );
+                    var contactClasses = "contact ";
+                    if( friend.friendAvaliability ) {
+                        var $statusDiv = $('<span class="status">')
+                        .text( "in your area" );
+                        contactClasses += "avaliable";
+                        
+                    } else {
+                        var $statusDiv = $('<span class="status">')
+                        .text( "away" );
+                        contactClasses += "away";
+                    }
+                    
 
                     // var typingClass = data.typing ? 'typing' : '';
-                    var $contactLi = $('<li class="contact"/>')
+                    var $contactLi = $('<li class="' + contactClasses + '"/>')
                         .data('friendName', friend.friendName)
                         .append($usernameDiv, $statusDiv)
                         .click(function() {
@@ -300,6 +385,20 @@ $(function () {
 
                     $CLfriendList.append($contactLi);
             } 
+        }
+    });
+    
+    socket.on('add friend result', function(data){
+        if( !data.friendAdded ) {
+            displayAlert({
+               title: "Friend not found",
+               content: data.errorMessage
+            });
+        } else {
+            displayAlert({
+               title: "Friend added!",
+               content: ""
+            });
         }
     });
 
@@ -318,12 +417,32 @@ $(function () {
             connected = true;
             openContactListPage();
         } else {
-            alert( "Register Fail: " + data.errorMessage );
-            openLoginPage();
+            console.log( "register failed " + data );
+            // alert( "Register Fail: " + data.errorMessage );
+            displayError({
+               title: "Registration Failure",
+               content: data.errorMessage
+            });
+            openSignupPage();
         }
     });
     
     $( document ).ready(function() {
         onLoad();
     });
+    
+    function displayAlert( data ) {
+        console.log( "Opening alert " + data.title );
+        $('#genericAlert .title').html( data.title );
+        $('#genericAlert .content').html( data.content );
+        $('#genericAlert').foundation( 'open');
+    }
+    
+    function displayError( data ) {
+        console.log( "Opening error " + data.title );
+        
+        $('#genericError .title').html( data.title );
+        $('#genericError .content').html( data.content );
+        $('#genericError').foundation( 'open');
+    }
 });
